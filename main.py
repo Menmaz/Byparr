@@ -94,11 +94,7 @@ def read_item(request: LinkRequest) -> LinkResponse:
             response = LinkResponse(
                 message="Success",
                 solution=Solution(
-                    userAgent=sb.get_user_agent(),
-                    url=sb.get_current_url(),
-                    status=200,
-                    cookies=sb.get_cookies(),
-                    headers={},
+                    
                     response=source,
                 ),
                 startTimestamp=start_time,
