@@ -31,15 +31,17 @@ def read_root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
-    health_check_request = read_item(
-        LinkRequest.model_construct(url="https://prowlarr.servarr.com/v1/ping")
-    )
-
-    if health_check_request.solution.status != HTTPStatus.OK:
+  try:
+        response = requests.get("https://prowlarr.servarr.com/v1/ping")
+        if response.status_code != HTTPStatus.OK:
+            raise HTTPException(
+                status_code=500,
+                detail="Health check failed",
+            )
+    except requests.RequestException as e:
         raise HTTPException(
             status_code=500,
-            detail="Health check failed",
+            detail=f"Health check request failed: {e}",
         )
 
     return {"status": "ok"}
@@ -91,14 +93,7 @@ def read_item(request: LinkRequest) -> LinkResponse:
                 sb.save_screenshot(f"./screenshots/{request.url}.png")
                 raise_captcha_bypass_error()
 
-            response = LinkResponse(
-                message="Success",
-                solution=Solution(
-                    
-                    response=source,
-                ),
-                startTimestamp=start_time,
-            )
+            response = {'html': source}
             cookies = sb.get_cookies()
         except Exception as e:
             logger.error(f"Error: {e}")
